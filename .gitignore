@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# SQL Server
+*.ldf
+*.mdf
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store

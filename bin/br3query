@@ -1,0 +1,113 @@
+/*
+BR # 3 CUSTOMER PURCHASE BEHAVIOUR ANALYSIS for the Top Performing Customers in each Region 
+*/
+
+CREATE NONCLUSTERED INDEX IX_FactSales_Analytics 
+ON FACTSALES
+(
+    Datekey,
+    salesstatus,
+    customerkey
+)
+INCLUDE
+(
+    SalesAmount,
+    OrderNumber
+)
+
+CREATE NONCLUSTERED INDEX IX_DimCustomer_Region
+ON DIMCUSTOMER
+(
+    customerKey,
+    regionkey
+)
+
+CREATE NONCLUSTERED INDEX IX_DimDate_Year
+ON DimDate
+(
+    calendarYear,
+    datekey
+)
+
+
+with RegionSales As(
+    SELECT  
+            dc.RegionKey, 
+            Sum(fs.SalesAmount) as TotalRegionSales
+FROM FACTSALES fs
+INNER JOIN DIMCUSTOMER dc
+    ON fs.CustomerKey = dc.CustomerKey
+--INNER JOIN dimregion dr
+--    ON dc.regionkey = dr.regionkey
+INNER JOIN DimDate dd
+    ON fs.datekey = dd.datekey
+WHERE dd.calendarYear = 2025 
+    AND fs.salesstatus = 'completed'
+GROUP BY    
+            dc.regionkey
+), 
+
+customerSales As(
+    SELECT 
+        fs.customerKey,
+        dc.regionkey,
+        COUNT(DISTINCT(fs.OrderNumber)) as TotalOrders,
+        SUM(fs.SalesAmount) as TotalCustomerSales
+FROM FACTSALES fs
+INNER JOIN DIMCUSTOMER dc
+    ON fs.CustomerKey = dc.CustomerKey 
+INNER JOIN DimDate dd
+    ON fs.datekey = dd.datekey
+WHERE dd.calendarYear = 2025 
+    AND fs.salesstatus = 'completed'
+GROUP BY 
+    fs.customerKey,
+    dc.regionkey
+),
+
+customerPerformance AS (
+    SELECT
+            cs.customerkey,
+            cs.regionkey,
+            cs.TotalOrders,
+            cs.TotalCustomerSales,
+            rs.TotalRegionSales,
+            CAST(cs.TotalCustomerSales As DECIMAL(18,2))
+            /
+            NULLIF(cs.TotalOrders,0) 
+                as averageOrderValue,
+            CAST(cs.TotalCustomerSales AS DECIMAL(18,4))
+            /
+            NULLIF(CAST(rs.TotalRegionSales as DECIMAL(18,4)),0)
+            *
+            100 
+                AS salesContributionPct,
+            Rank() OVER 
+            (
+                PARTITION BY cs.regionkey 
+                ORDER BY cs.TotalCustomerSales DESC
+            ) as customerRank
+FROM customerSales as Cs
+INNER JOIN RegionSales as rs
+    ON cs.regionkey = rs.regionkey
+)
+SELECT 
+    dr.regionname,
+    dc.customerId,
+    dc.customerName,
+    cp.TotalOrders,
+    cp.TotalCustomerSales,
+    ROUND(cp.averageOrderValue,2) as averageOrderValue,
+    ROUND(cp.TotalRegionSales,2) as TotalRegionSales,
+    ROUND(cp.salesContributionPct,2) as salesContributionPct,
+    cp.customerRank
+FROM customerPerformance as cp
+INNER JOIN DIMCUSTOMER  as dc
+    ON cp.customerkey = dc.customerkey
+INNER JOIN dimregion as dr
+    ON dc.regionkey = dr.regionkey
+WHERE cp.customerRank <=5
+ORDER BY 
+        dr.regionname,
+        cp.customerRank,
+        cp.TotalCustomerSales DESC;
