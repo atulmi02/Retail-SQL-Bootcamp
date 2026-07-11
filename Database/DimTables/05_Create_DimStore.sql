@@ -7,14 +7,10 @@ Script  : 04_Create_DimStore.sql
 ******************************************************************************/
 
 USE Retail_SQL_Bootcamp;
-SET FOREIGN_KEY_CHECKS = 0;
-
-TRUNCATE TABLE DimEmployee;
-TRUNCATE TABLE DimStore;
 
 DROP TABLE IF EXISTS DimStore;
 
-SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE TABLE DimStore
 (
     StoreKey        INT AUTO_INCREMENT PRIMARY KEY,

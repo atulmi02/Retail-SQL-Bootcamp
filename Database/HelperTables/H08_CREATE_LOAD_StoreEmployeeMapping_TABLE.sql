@@ -12,6 +12,7 @@ CREATE TABLE H_StoreEmployeeMap
 );
 /*
 LOAD HELPER TABLE
+only after DimEmployee is populated 
 */
 INSERT INTO H_StoreEmployeeMap
 (

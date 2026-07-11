@@ -32,3 +32,9 @@ WITH RECURSIVE NumberSeries AS
 
 SELECT NumberID
 FROM NumberSeries;
+
+/*
+Validation
+*/
+SELECT min(numberid) AS MinNumber, max(numberid) AS MaxNumber, count(*) AS TotalNumbers
+FROM H_Numbers;
