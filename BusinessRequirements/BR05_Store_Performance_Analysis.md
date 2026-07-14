@@ -79,7 +79,6 @@ FactSales
 - Sales Contribution %
 - Store Rank on Gross Sales
 - Company total sales
-- 
 
 ---
 

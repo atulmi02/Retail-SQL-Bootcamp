@@ -3,7 +3,7 @@
 Business Requirement : BR #06 - Product Performance Analysis
 Author               : Atul Kumar Keshari
 Database             : Retail_SQL_Bootcamp
-Description          : This report provides comprehensive analysis of product performance by identifying best-performing product based on gross sales and measuring each product contribution to it's product category.
+Description          : This report provides comprehensive analysis of product performance by identifying best-performing products based on gross sales and measuring each products contribution to it's product category.
 
 Grain:One row represents the total completed sales for 2025 of single product with it's contribution to it's product cateogry.
 
@@ -35,8 +35,9 @@ CategorySales AS (
     INNER JOIN DimProduct AS dp
         ON pgs.ProductKey = dp.ProductKey
     GROUP BY dp.Category
-)
+),
 -- CTE 3 - ProductPerformance
+ProductPerformance AS (
     SELECT 
             pgs.ProductKey,
             pgs.GrossSales,
@@ -59,3 +60,24 @@ CategorySales AS (
         ON pgs.ProductKey = dp.ProductKey
     Inner Join CategorySales AS cs
         ON dp.Category = cs.Category
+)
+
+-- FINAL SELECT 
+SELECT 
+        dp.ProductId,
+        dp.ProductName,
+        pp.Category,
+        
+        pp.TotalOrders,
+        pp.GrossSales,
+        ROUND(pp.AverageOrderValue,2) AS AverageOrderValue,
+
+        ROUND(pp.TotalCategorySales,2) AS TotalCategorySales,
+        ROUND(pp.ProductCategoryPct,2) AS ProductCategoryPct,
+        
+        pp.productRank
+FROM ProductPerformance AS pp
+INNER JOIN DimProduct AS dp
+    ON pp.ProductKey = dp.ProductKey
+WHERE pp.productRank <= 3
+ORDER BY pp.Category, pp.productRank, pp.GrossSales DESC

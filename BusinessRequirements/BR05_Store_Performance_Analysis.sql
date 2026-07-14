@@ -84,7 +84,7 @@ SELECT
         sp.GrossSales,
         sp.TotalOrders,
         ROUND(sp.AverageOrderValue,2) AS AverageOrderValue,
-        ROUND(sp.SalesContributionPct,2) AS SalesContributionPercentage,
+        ROUND(sp.SalesContributionPctage,2) AS SalesContributionPercentage,
         sp.StoreRank
 FROM StorePerformance AS sp
 INNER JOIN DimStore AS ds
