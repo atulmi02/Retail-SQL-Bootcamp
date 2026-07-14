@@ -222,7 +222,7 @@ OrderNumber
 
 ## Learning Outcome
 
-After completing this Business Requirement, you will understand:
+After completing this Business Requirement, we will understand:
 
 - Time-series analysis
 - Running totals
