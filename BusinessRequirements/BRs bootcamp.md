@@ -474,3 +474,54 @@ Retail-SQL-Bootcamp/
 └── README.md
 
 This mirrors the structure of many real-world analytics repositories and will make your GitHub portfolio look polished and professional.
+---
+# Phase 2: Advanced SQL Development
+
+We'll revisit the BRs and implement:
+
+Query optimization
+Execution plan analysis
+Index tuning
+Temporary tables
+Stored procedures
+Transactions
+Recursive CTEs
+Advanced window functions
+---
+# Phase 3: Analytics Engineering
+
+We'll convert the SQL into production assets:
+
+Views
+Dashboard datasets
+ETL pipelines with Python
+Power BI dashboards
+GitHub documentation
+Portfolio website (optional)
+
+Retail_SQL_Bootcamp
+│
+├── README.md
+│
+├── Databases
+│   ├── Schema
+│   ├── Data Generation
+│   └── Sample Data
+│
+├── Business Requirements
+│   ├── BR01_Customer_Sales_Summary
+│   ├── BR02_Regional_Sales_Analysis
+│   ├── ...
+│   └── BR15_Executive_Dashboard
+│
+├── Stored Procedures
+├── Views
+├── Query Optimization
+├── Execution Plans
+├── Indexing
+├── Transactions
+├── Recursive CTE
+├── Dashboard Datasets
+├── Power BI
+├── Python ETL
+└── Documentation
