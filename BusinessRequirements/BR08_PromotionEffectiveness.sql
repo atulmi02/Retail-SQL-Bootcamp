@@ -1,9 +1,9 @@
 /*
 ===============================================================================
-Business Requirement : BR #08 - Employee Performance Analysis
+Business Requirement : BR #08 - Promotion Performance Analysis
 Author               : Atul Kumar Keshari
 Database             : Retail_SQL_Bootcamp
-Description          : This report provides comprehensive analysis of Promotion performance by identifying best-performing Promotion based on gross sales and measuring each Promortion contribution to Company's Total sales
+Description          : This report provides comprehensive analysis of Promotion performance by identifying best-performing Promotion based on gross sales and measuring each promortion's contribution to company's total sales
 */
 
 -- CTE 1- Promotion Sales
