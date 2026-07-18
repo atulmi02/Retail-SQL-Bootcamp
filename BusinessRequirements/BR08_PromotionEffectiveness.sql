@@ -11,7 +11,7 @@ Description          : This report provides comprehensive analysis of Promotion 
 With PromotionSales AS  (
     SELECT fs.PromotionKey,
             COUNT(DISTINCT fs.orderNumber) as TotalOrders,
-            SUM(fs.salesamount) as PromoGrossSales
+            SUM(fs.salesamount) as PromotionGrossSales
     FROM factsales as fs
     INNER JOIN dimdate as dd 
         ON fs.datekey = dd.datekey
@@ -20,10 +20,10 @@ With PromotionSales AS  (
     GROUP BY fs.PromotionKey
 ),
 
--- CTE 2- Company's Total Sales
+-- CTE 2- CompanyTotalSales
 
 CompanyTotalSales AS (
-    SELECT sum(ps.PromoGrossSales) as TotalCompanySales
+    SELECT sum(ps.PromotionGrossSales) as TotalCompanySales
     FROM PromotionSales as ps
 ),
 
@@ -32,20 +32,20 @@ PromotionPerformance AS (
     SELECT 
         ps.promotionkey,
         ps.totalOrders,
-        ps.PromoGrossSales,
+        ps.PromotionGrossSales,
         cts.totalCompanySales,
         -- AverageOrderValue
-        CAST(ps.PromoGrossSales AS DECIMAL(18,4))
+        CAST(ps.PromotionGrossSales AS DECIMAL(18,4))
         /
         NULLIF(CAST(ps.totalOrders AS DECIMAL(18,4)),0) AS avgOrderValue,
         
         -- PromotionContributionPct
-        CAST(ps.PromoGrossSales AS DECIMAL(18,4))
+        CAST(ps.PromotionGrossSales AS DECIMAL(18,4))
         /
-        NULLIF(CAST(cts.totalCompanySales AS DECIMAL(18,4)),0)*100 AS PromoSalesContributionPct,
+        NULLIF(CAST(cts.totalCompanySales AS DECIMAL(18,4)),0)*100 AS PromotionSalesContributionPct,
 
         -- Rank Promotion on Promotion Gross Sales
-        RANK()OVER(ORDER BY ps.PromoGrossSales DESC) AS PromoRank
+        RANK()OVER(ORDER BY ps.PromotionGrossSales DESC) AS PromotionRank
 
     FROM PromotionSales AS ps
     CROSS JOIN CompanyTotalSales AS cts
@@ -57,18 +57,18 @@ PromotionPerformance AS (
             dp.promotionType,
 
             pp.totalOrders,
-            ROUND(pp.promoGrossSales,2) AS PromotionGrossSales,
+            ROUND(pp.PromotionGrossSales,2) AS PromotionGrossSales,
             ROUND(pp.avgOrderValue,2) AS avgOrderValue,
            
             ROUND(pp.totalCompanySales,2) AS CompanyTotalSales,
-            ROUND(pp.promoSalesContributionPct,2) AS promoSalesContributionPct,
+            ROUND(pp.PromotionSalesContributionPct,2) AS PromotionSalesContributionPct,
 
-            pp.promoRank
+            pp.PromotionRank
 
     FROM PromotionPerformance AS pp
     INNER JOIN DimPromotion AS dp
         ON pp.PromotionKey = dp.PromotionKey
-    WHERE pp.promoRank <=5
-    ORDER BY pp.promoRank,pp.promoGrossSales DESC;
+    WHERE pp.PromotionRank <=5
+    ORDER BY pp.PromotionRank,pp.PromotionGrossSales DESC;
 
     
