@@ -1,61 +1,42 @@
-/*
-===============================================================================
-Business Requirement : BR #06 - Product Performance Analysis
-Author               : Atul Kumar Keshari
-Database             : Retail_SQL_Bootcamp
-Description          : This report provides comprehensive analysis of product performance by identifying best-performing product based on gross sales and measuring each product contribution to it's product category.
-
-Grain:One row represents the total completed sales for 2025 of single product with it's contribution to it's product cateogry.
-
-Tables Used:
-    • FactSales
-    • DimProduct
-    • DimDate
-*/
-
--- CTE ! - ProductGrossSales
-With ProductGrossSales AS (
-    SELECT
-        fs.productkey,
-        Sum(fs.salesamount)             AS GrossSales,
-        Count(DISTINCT fs.ordernumber)  AS TotalOrders
-    FROM FactSales AS fs
-    INNER JOIN DimDate AS dd
-        ON fs.DateKey = dd.DateKey
-        WHERE fs.SalesStatus = 'completed' 
-            AND dd.CalendarYear = 2025
-        GROUP BY fs.productkey
+With EmployeeSales AS  (
+    SELECT fs.employeeKey,
+            COUNT(DISTINCT fs.orderNumber) as TotalOrders,
+            SUM(fs.salesamount) as EmployeeGrossSales
+    FROM factsales as fs
+    INNER JOIN dimdate as dd 
+        ON fs.datekey = dd.datekey
+    WHERE fs.salesstatus = 'completed'
+        AND dd.calendarYear = 2025
+    GROUP BY fs.EmployeeKey
 ),
--- CTE 2 - CategorySales
-CategorySales AS (
-    SELECT
-        dp.Category,
-        SUM(pgs.GrossSales) AS TotalCategorySales    
-    FROM ProductGrossSales AS pgs
-    INNER JOIN DimProduct AS dp
-        ON pgs.ProductKey = dp.ProductKey
-    GROUP BY dp.Category
+
+-- CTE 2- Company's Total Sales
+
+CompanyTotalSales AS (
+    SELECT sum(es.employeegrosssales) as TotalCompanySales
+    FROM EmployeeSales as es
 )
--- CTE 3 - ProductPerformance
+
+-- CTE 3- EmployeePerformance
+
     SELECT 
-            pgs.ProductKey,
-            pgs.GrossSales,
-            pgs.TotalOrders,
-            dp.Category,
-            cs.TotalCategorySales,
-            -- Avg Order Value = Gross Sales / Total Orders
-            CAST(pgs.GrossSales AS DECIMAL(18,2))
-            /
-            NULLIF(pgs.TotalOrders,0) AS AverageOrderValue,
-            -- Product Contribution to Category = Gross Sales / Total Category Sales * 100
-            CAST(pgs.GrossSales AS DECIMAL(18,2))
-            /
-            NULLIF(CAST(cs.TotalCategorySales AS DECIMAL(18,2)),0)
-            *100 AS ProductCategoryPct,
-            -- Product Rank based on Gross Sales within it's Category
-            RANK()OVER(PARTITION BY cs.category ORDER BY pgs.GrossSales DESC) AS productRank
-    FROM ProductGrossSales AS pgs
-    INNER JOIN DimProduct AS dp
-        ON pgs.ProductKey = dp.ProductKey
-    Inner Join CategorySales AS cs
-        ON dp.Category = cs.Category
+        es.employeekey,
+        es.totalOrders,
+        es.employeeGrossSales,
+        
+        -- AverageOrderValue
+        CAST(es.employeeGrossSales AS DECIMAL(18,2))
+        /
+        NULLIF(CAST(es.totalOrders AS DECIMAL(18,2)),0) AS avgOrderValue,
+        
+        -- EmployeeContributionPct
+        CAST(es.employeeGrossSales AS DECIMAL(18,2))
+        /
+        NULLIF(CAST(cts.totalCompanySales AS DECIMAL(18,2)),0)*100 AS empSalesContributionPct,
+
+        -- Rank Employee on Employee Gross Sales
+        RANK()OVER(ORDER BY es.employeeGrossSales DESC) AS employeeRank
+
+    FROM EmployeeSales AS es
+    CROSS JOIN CompanyTotalSales AS cts;
+
