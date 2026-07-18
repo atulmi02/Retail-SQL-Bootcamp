@@ -69,6 +69,6 @@ PromotionPerformance AS (
     INNER JOIN DimPromotion AS dp
         ON pp.PromotionKey = dp.PromotionKey
     WHERE pp.promoRank <=5
-    ORDER BY pp.promoRank,pp.promoGrossSales;
+    ORDER BY pp.promoRank,pp.promoGrossSales DESC;
 
     
