@@ -1,6 +1,6 @@
 # BR #09 - Customer Lifetime Value (CLV) Analysis
 
-## Business Requirement
+## Business Objective
 
 The Sales Director wants to identify the company's most valuable customers based on their lifetime purchasing behaviour.
 
@@ -137,8 +137,12 @@ Customer Gross Sales/Company Sales * 100
 
 ### ActiveDays
 
+```
 ActiveDays = LastPurchase - FirstPurchase + 1
+```
 
 ### CustomerLifetimeValue
 
+```
 CustomerLifetimeValue = Average Order Value * Purchase Frequency
+```
