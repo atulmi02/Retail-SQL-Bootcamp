@@ -152,4 +152,4 @@ CONCAT(R_Score, F_Score, M_Score)
 | High R + High F   | Loyal Customer    |
 | High R + Medium F | Potetial Loyalist |
 | Low R + High M    | At Risk           |
-| Low R + Low F     | Low Customer      |
+| Low R + Low F     | Lost Customer      |
