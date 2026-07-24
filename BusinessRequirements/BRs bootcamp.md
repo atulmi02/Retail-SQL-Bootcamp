@@ -299,3 +299,105 @@ Retail_SQL_Bootcamp
 ├── Power BI
 ├── Python ETL
 └── Documentation
+
+---
+
+# Retail SQL Bootcamp - Business Requirement Roadmap
+
+| BR | Business Requirement | Primary SQL Concepts | New Concepts Introduced |
+|----|----------------------|----------------------|-------------------------|
+| BR01 | Sales Summary Analysis | SELECT, WHERE, GROUP BY, SUM, COUNT | Aggregate Functions |
+| BR02 | Customer Sales Ranking | GROUP BY, JOIN, RANK() | Ranking Window Functions |
+| BR03 | Product Sales Ranking | Multiple CTEs, LEFT JOIN, RANK(), ISNULL/COALESCE | Multi-CTE Queries |
+| BR04 | Monthly Sales Trend Analysis | LAG(), Running Total, Window Aggregate | LAG(), Running Total |
+| BR05 | Store Performance Analysis | CROSS JOIN, Company Contribution %, RANK() | CROSS JOIN, Percentage Calculations |
+| BR06 | Product Performance Analysis | PARTITION BY, Category Ranking | Partitioned Ranking |
+| BR07 | Employee Performance Analysis | Company Contribution %, RANK() | Business KPI Calculations |
+| BR08 | Promotion Effectiveness Analysis | Ranking, Contribution %, Filtering Top N | Top-N Analysis |
+| BR09 | Customer Lifetime Value (CLV) | MIN(), MAX(), DATEDIFF(), AOV | Date Intelligence, Customer Metrics |
+| BR10 | RFM Customer Segmentation | NTILE(), CASE, Business Segmentation | NTILE(), Customer Classification |
+| BR11 | Customer Retention Analysis | LAG(), LEAD(), FIRST_VALUE(), LAST_VALUE() | Customer Retention Analytics |
+| BR12 | Inventory Movement Analysis | Running Stock, SUM() OVER(), Conditional Aggregation | Inventory Analytics |
+| BR13 | Sales Target Achievement | Multiple JOINs, Variance Analysis | KPI vs Target Analysis |
+| BR14 | Regional Top Products | ROW_NUMBER(), DENSE_RANK(), PARTITION BY | Advanced Ranking |
+| BR15 | Pareto (80/20) Sales Analysis | Cumulative %, Running %, Window Aggregates | Pareto Analysis |
+| BR16 | ABC Product Classification | Running Total, CASE, Percentage Bands | ABC Classification |
+| BR17 | Cohort Analysis | DATE_FORMAT(), Cohort Month, Retention | Cohort Analysis |
+| BR18 | Market Basket Analysis | Self JOIN, Pair Analysis | Basket Analysis |
+| BR19 | Executive Dashboard Dataset | Complex CTEs, Dashboard KPIs | Dashboard Dataset Design |
+| BR20 | Executive Summary Report | Combined KPIs, Multi-Source Reporting | Executive Reporting |
+
+---
+
+# SQL Concepts Coverage
+
+| SQL Concept | BR Covered |
+|-------------|------------|
+| SELECT | BR01-BR20 |
+| WHERE | BR01-BR20 |
+| ORDER BY | BR01-BR20 |
+| GROUP BY | BR01-BR20 |
+| HAVING | BR02, BR03 |
+| INNER JOIN | BR02-BR20 |
+| LEFT JOIN | BR03, BR15 |
+| CROSS JOIN | BR05, BR07, BR08, BR09 |
+| CTE | BR03-BR20 |
+| Aggregate Functions | BR01-BR20 |
+| CASE | BR10, BR16 |
+| CAST | BR05-BR20 |
+| NULLIF | BR05-BR20 |
+| COALESCE / IFNULL | BR03, BR15 |
+| RANK() | BR02-BR08, BR09 |
+| DENSE_RANK() | BR14 |
+| ROW_NUMBER() | BR14 |
+| LAG() | BR04, BR11 |
+| LEAD() | BR11 |
+| FIRST_VALUE() | BR11 |
+| LAST_VALUE() | BR11 |
+| SUM() OVER() | BR04, BR12, BR15, BR16 |
+| NTILE() | BR10 |
+| PARTITION BY | BR06, BR10, BR14 |
+| Running Total | BR04, BR12, BR15 |
+| Running Percentage | BR15 |
+| Percentage Contribution | BR05-BR09 |
+| Date Functions | BR04, BR09, BR11, BR17 |
+| DATEDIFF() | BR09, BR11 |
+| Recursive CTE | Future Advanced Module |
+| Temporary Tables | Future Advanced Module |
+| Stored Procedures | Future Advanced Module |
+| Transactions | Future Advanced Module |
+| Index Optimization | Applied Across Reports |
+| EXPLAIN / Query Plan | Performance Module |
+| Dashboard Dataset Design | BR19 |
+| Executive Reporting | BR20 |
+
+---
+
+# Learning Progression
+
+## Foundation
+- BR01 – BR03
+- Aggregations
+- Joins
+- Ranking
+
+## Intermediate Analytics
+- BR04 – BR10
+- Window Functions
+- Running Totals
+- Business KPIs
+- Customer Segmentation
+
+## Advanced Analytics
+- BR11 – BR18
+- Retention
+- Cohort Analysis
+- Pareto Analysis
+- ABC Classification
+- Basket Analysis
+
+## Production SQL
+- BR19 – BR20
+- Dashboard Dataset Design
+- Executive Reporting
+- Performance Optimization

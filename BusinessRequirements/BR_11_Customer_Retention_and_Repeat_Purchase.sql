@@ -44,7 +44,7 @@ CustomerPurchaseGap AS (
     FROM CustomerPurchaseHistory AS cph
 ),
 -- CTE 4- CustomerAvgGapDays
- CustomerAvgGapDays AS (
+CustomerAvgGapDays AS (
     SELECT 
             cpg.customerKey,
             -- cpg.orderNumber,
@@ -82,18 +82,32 @@ CustomerRetention AS (
 
             -- customer Retention
             CASE
-                WHEN cagd.totalOrders = 1 THEN 'First Customer'
+                WHEN cagd.totalOrders = 1 THEN 'One Time Customer'
+
+                WHEN  cagd.totalOrders >= 5 AND cagd.avgPurchaseGap <= 30 THEN 'Highly Loyal'
+                
                 WHEN cagd.totalOrders >= 5 THEN 'Loyal Customer'
+                
                 WHEN  cagd.avgPurchaseGap <= 30 THEN 'Highly Engaged'
+                
                 WHEN cagd.avgPurchaseGap <= 90 THEN 'Regular Customer'
+                ELSE 'Occasional Customer'
             END AS customerRetention
             
     FROM CustomerAvgGapDays AS cagd
 )
--- Fianl Select
-
 
 /*
+Verify Customer Retention Data
+SELECT
+    customerRetention,
+    COUNT(*) AS CustomerCount
+FROM CustomerRetention
+GROUP BY customerRetention;
+*/
+
+-- Fianl Select
+
 SELECT 
     dc.customerId       AS Customer_ID,
     dc.customerName     AS Customer_Name,
@@ -107,8 +121,8 @@ SELECT
 FROM CustomerRetention AS cr
 INNER JOIN DimCustomer AS dc
     ON cr.customerKey = dc.customerKey
+WHERE cr.customerRetention IN ('Loyal Customer', 'One Time Customer','Highly Engaged')
 ORDER BY 
     cr.totalOrders DESC,
     cr.activeDays DESC,
     cr.avgPurchaseGap;
-*/
