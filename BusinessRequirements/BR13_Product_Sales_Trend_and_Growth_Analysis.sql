@@ -42,9 +42,9 @@ ProductPerformance AS (
         (PARTITION BY pms.ProductKey ORDER BY pms.calendarMonth) AS PrevMonthSales
 
     FROM ProductMonthlySales AS pms
-)
+),
 -- CTE 3 - ProductGrowth
--- ProductGrowth AS (
+ProductGrowth AS (
     SELECT 
         pp.ProductKey,
         pp.calendarMonth,
@@ -71,4 +71,4 @@ ProductPerformance AS (
                 * 100
         END AS MOMGrowth
     FROM ProductPerformance AS pp
-
+)
