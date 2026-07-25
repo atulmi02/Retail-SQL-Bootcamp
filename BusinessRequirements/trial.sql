@@ -1,114 +1,85 @@
-/*
-===============================================================================
-Business Requirement : BR #11 - Customer Retention and Repeat Purchase
-Author               : Atul Kumar Keshari
-Database             : Retail_SQL_Bootcamp
-Description          : This report provides comprehensive analysis of Customer Retention and Repeat Purchase by identifying best Customer based on last purchase, average days between purchases, and active days.
-*/
--- CTE 1- CustomerOrders
-
-With CustomerOrders AS(
-    SELECT 
-        fs.customerkey,
-        fs.OrderNumber,
-        dd.fullDate AS purchaseDate
-    FROM FactSales AS fs
-    INNER JOIN DimDate AS dd
-        ON fs.datekey = dd.datekey
-    WHERE dd.calendaryear = 2025 
-        AND fs.salesStatus = 'completed'
-),
-
--- CTE 2- CustomerPurchaseHistory
-CustomerPurchaseHistory AS (
-    SELECT 
-        co.customerKey,
-        co.orderNumber,
-        co.purchaseDate,
-        
-        -- Previous Purchase Date
-        LAG(co.purchaseDate) OVER (PARTITION BY co.customerKey ORDER BY co.purchaseDate) AS prevPurchaseDate
-    FROM CustomerOrders AS co
-),
--- CTE 3- CustomerPurchaseGap
-CustomerPurchaseGap AS (
-    SELECT 
-        cph.customerKey,
-        cph.orderNumber,
-        cph.purchaseDate,
-        cph.prevPurchaseDate,
-
-        -- calculate difference between two purchase days
-        DATEDIFF(cph.purchaseDate,cph.prevpurchaseDate) AS purchaseGapDays
-        
-    FROM CustomerPurchaseHistory AS cph
-),
--- CTE 4- CustomerAvgGapDays
- CustomerAvgGapDays AS (
-    SELECT 
-            cpg.customerKey,
-            -- cpg.orderNumber,
-            -- cpg.purchaseDate,
-            -- cpg.prevPurchaseDate,
-            -- cpg.purchaseGapDays,
-
-            MIN(cpg.purchaseDate) AS firstPurchase,
-            MAX(cpg.purchaseDate) AS lastPurchase,
-            COUNT(DISTINCT cpg.OrderNumber) AS totalOrders,
-
-            -- Average Purchase Gap Days
-            AVG(cpg.purchasegapDays) as avgPurchaseGap,
-            
-            -- Active Days 
-            DATEDIFF(MAX(cpg.purchaseDate),MIN(cpg.purchaseDate)) +1 AS activeDays
-            
-    FROM CustomerPurchaseGap AS cpg
+With MonthlySales AS (
+    SELECT
+            dd.calendarMonth,
+            dd.monthName,
+            COUNT(DISTINCT orderNumber) AS totalOrders,
+            CAST(SUM(fs.salesAmount) AS DECIMAL(18,4)) AS grossSales
+    FROM factSales AS fs
+    INNER JOIN dimDate AS dd
+        ON fs.dateKey = dd.dateKey 
+    WHERE fs.salesStatus = 'completed' 
+        AND dd.calendarYear = 2025 
     GROUP BY 
-            cpg.customerKey
+        dd.calendarMonth,dd.monthName
 ),
--- CTE 5- CustomerRetention
-CustomerRetention AS (
-    SELECT 
-            cagd.customerKey,
-            -- cagd.orderNumber,
-            -- cagd.purchaseDate,
-            -- cagd.prevPurchaseDate,
-            -- cagd.purchaseGapDays,
-            cagd.firstPurchase,
-            cagd.lastPurchase,
-            cagd.totalOrders,
-            cagd.avgPurchaseGap,
-            cagd.activeDays,
 
-            -- customer Retention
-            CASE
-                WHEN cagd.totalOrders = 1 THEN 'First Customer'
-                WHEN cagd.totalOrders >= 5 THEN 'Loyal Customer'
-                WHEN  cagd.avgPurchaseGap <= 30 THEN 'Highly Engaged'
-                WHEN cagd.avgPurchaseGap <= 90 THEN 'Regular Customer'
-            END AS customerRetention
-            
-    FROM CustomerAvgGapDays AS cagd
+-- CTE 2- MonthlyPerformance
+MonthlyPerformance AS (
+    SELECT
+        ms.calendarMonth,
+        ms.monthName,
+        ms.totalOrders,
+
+        -- AverageOrderValue
+        ms.grossSales
+        /
+        NULLIF(CAST(ms.totalOrders AS DECIMAL(18,4)),0)
+        AS AvgOrderValue,
+
+        ms.grossSales,
+
+        -- PreviousMonthSales
+        lag(ms.grossSales)
+        OVER(ORDER BY ms.calendarmonth 
+            ROWS BETWEEN UNBOUNDED PRECEDING 
+                AND CURRENT ROW) AS prevMonthSales,
+
+        -- RunningSales
+        SUM(ms.grossSales)
+        OVER(ORDER BY ms.calendarmonth
+                ROWS BETWEEN UNBOUNDED PRECEDING 
+                    AND CURRENT ROW) AS runningSales
+        
+    FROM monthlySales AS ms
+),
+MonthlyGrowth AS (
+    SELECT
+        mp.calendarMonth,
+        mp.monthName,
+        mp.totalOrders,
+        mp.AvgOrderValue,
+        mp.grossSales,
+        mp.prevMonthSales,
+
+        -- SalesDifference
+        mp.grossSales
+        -
+        COALESCE(mp.prevMonthSales,mp.grossSales) AS salesDiff,
+        
+        -- MOM Growth%
+        CASE
+            WHEN mp.prevMonthSales IS NULL THEN 0
+        ELSE
+            ((mp.grossSales
+            -
+                NULLIF(mp.prevMonthSales,0))
+            /
+                NULLIF(mp.prevMonthSales,0))
+            *100 
+        END AS MOMgrowth,
+
+        mp.runningSales AS runningSales
+
+    FROM MonthlyPerformance AS mp
 )
--- Fianl Select
-
-
-/*
-SELECT 
-    dc.customerId       AS Customer_ID,
-    dc.customerName     AS Customer_Name,
-    cr.firstPurchase    AS First_Purchase,
-    cr.lastPurchase     AS Last_Purchase,
-    cr.totalOrders      AS Total_Orders,
-    cr.avgPurchaseGap   AS Avg_Gap_Days,
-    cr.activeDays       AS ActiveDays,
-    cr.customerRetention AS Customer_Type
-
-FROM CustomerRetention AS cr
-INNER JOIN DimCustomer AS dc
-    ON cr.customerKey = dc.customerKey
-ORDER BY 
-    cr.totalOrders DESC,
-    cr.activeDays DESC,
-    cr.avgPurchaseGap;
-*/
+SELECT  
+        mg.calendarMonth,
+        mg.monthName,
+        mg.totalOrders,
+        ROUND(mg.AvgOrderValue,2) AS AvgOrderValue,
+        ROUND(mg.grossSales,2) AS GrossSales,
+        ROUND(mg.prevMonthSales,2) AS PrevMonthSales,
+        ROUND(mg.salesDiff,2) AS SalesDifference,
+        ROUND(mg.momGrowth,2) AS MOMgrowth,
+        ROUND(mg.runningSales,2) AS RunningSales
+FROM monthlyGrowth AS mg;
