@@ -31,7 +31,7 @@ MonthlyPerformance AS (
         -- AverageOrderValue
         ms.grossSales
         /
-        ms.totalOrders
+        NULLIF(ms.totalOrders,0)
         AS AvgOrderValue,
 
          ms.grossSales,
@@ -40,13 +40,14 @@ MonthlyPerformance AS (
         lag(ms.grossSales)OVER(ORDER BY ms.calendarMonth) AS prevMonthSales,
 
         -- RunningSales
-        SUM(ms.grossSales)OVER(ORDER BY ms.calendarMonth) AS runningSales
+        SUM(ms.grossSales)OVER(ORDER BY ms.calendarMonth
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS runningSales
         
     FROM monthlySales AS ms
 ),
 
--- CTE 3- MonthlyGrowth
-MonthlyGrowth AS (
+-- CTE 3- MonthlyTrend
+MonthlyTrend AS (
     SELECT
         mp.calendarMonth,
         mp.monthName,
@@ -56,17 +57,27 @@ MonthlyGrowth AS (
         mp.prevMonthSales,
 
         -- SalesDifference
-        mp.grossSales
-        -
-        NULLIF(mp.prevMonthSales,0) AS salesDiff,
-        
+        CASE 
+            WHEN 
+                mp.prevMonthSales IS NULL 
+                    THEN mp.grossSales
+            ELSE
+                mp.grossSales
+                -
+                mp.prevMonthSales
+        END AS salesDiff,
+                
         -- MOM Growth%
-        mp.grossSales
-        -
-        NULLIF(mp.prevMonthSales,0)
-        /
-        NULLIF(mp.prevMonthSales,0)
-        *100 AS MOMgrowth,
+        CASE 
+            WHEN mp.prevMonthSales IS NULL OR mp.prevMonthSales = 0 THEN 0
+            ELSE
+                (mp.grossSales
+                -
+                NULLIF(mp.prevMonthSales,0))
+                /
+                NULLIF(mp.prevMonthSales,0)
+                *100 
+            END AS MOMgrowth,
 
         mp.runningSales AS runningSales
 
@@ -84,4 +95,4 @@ SELECT
         ROUND(mg.salesDiff,2) AS SalesDifference,
         ROUND(mg.momGrowth,2) AS MOMgrowth,
         ROUND(mg.runningSales,2) AS RunningSales
-FROM monthlyGrowth AS mg;
+FROM monthlyTrend AS mg;

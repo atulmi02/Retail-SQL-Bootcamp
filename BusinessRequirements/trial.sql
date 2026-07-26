@@ -39,7 +39,11 @@ ProductPerformance AS (
         pms.grossSales,
         -- PrevMonthSales
         LAG(pms.grossSales) OVER 
-        (PARTITION BY pms.ProductKey ORDER BY pms.calendarMonth) AS PrevMonthSales
+        (PARTITION BY pms.ProductKey ORDER BY pms.calendarMonth) AS PrevMonthSales,
+
+        -- Running Product Sales
+        SUM(pms.grossSales) OVER 
+        (PARTITION BY pms.ProductKey ORDER BY pms.calendarMonth) AS RunningProductSales
 
     FROM ProductMonthlySales AS pms
 )
@@ -55,9 +59,13 @@ ProductPerformance AS (
         pp.prevMonthSales,
 
         -- SalesDifference
-        NULLIF(pp.prevMonthSales 
-        -
-        pp.grossSales,pp.grossSales) AS salesDifference,
+        CASE
+            WHEN pp.prevMonthSales IS NULL OR pp.prevMonthSales = 0 THEN pp.grossSales
+            ELSE     
+            pp.prevMonthSales    
+            -
+            pp.grossSales
+        END AS salesDifference,
 
         -- MoMgrowth%
         CASE
@@ -69,6 +77,8 @@ ProductPerformance AS (
                 /
                 NULLIF(pp.prevMonthSales,0) 
                 * 100
-        END AS MOMGrowth
+        END AS MOMGrowth,
+
+        pp.runningProductSales
     FROM ProductPerformance AS pp
 

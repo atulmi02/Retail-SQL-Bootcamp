@@ -49,13 +49,17 @@ The project focuses on solving practical analytics problems using professional S
 | BR01 | Sales Performance Analysis   | Completed  |
 | BR02 | Top Products by Net Sales    | Completed  |
 | BR03 | Customer Purchase Behaviour  | Completed  |
-| BR04 | Monthly Sales Trend Analysis | InProgress |
-| BR05 | Store Performance            | Pending    |
-| BR06 | Promotion Effectiveness      | Pending    |
-| BR07 | Employee Performance         | Pending    |
-| BR08 | Customer Lifetime Value      | Pending    |
-| BR09 | RFM Analysis                 | Pending    |
-| BR10 | Inventory Analytics          | Pending    |
+| BR04 | Monthly Sales Trend Analysis | Completed  |
+| BR05 | Store Performance            | Completed  |
+| BR06 | Product Performance          | Completed  |
+| BR07 | Employee Performance         | Completed  |
+| BR00 | Promotion Effectiveness      | Completed  |
+| BR09 | Customer Lifetime Value      | Completed  |
+| BR10 | RFM Analysis                 | Completed  |
+| BR11 | Customer Retention & Repeat Purchase | Completed  |
+| BR12 | Month on Month Sales Growth Trend  | Completed  |
+| BR13 | Product Sales Month on Month Growth Trend | Completed  |
+
 
 ## Skills Demonstrated
 

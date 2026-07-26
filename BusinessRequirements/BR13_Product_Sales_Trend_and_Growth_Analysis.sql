@@ -5,6 +5,7 @@ Author               : Atul Kumar Keshari
 Database             : Retail_SQL_Bootcamp
 Description          : This report provides comprehensive analysis of Product Sales Trend and Growth Analysis by identifying previous month sales, MOM Growth, Cumulative Sales.
 */
+
 -- CTE 1 - ProductMonthlySales
 WITH ProductMonthlySales AS (
     SELECT
@@ -39,12 +40,16 @@ ProductPerformance AS (
         pms.grossSales,
         -- PrevMonthSales
         LAG(pms.grossSales) OVER 
-        (PARTITION BY pms.ProductKey ORDER BY pms.calendarMonth) AS PrevMonthSales
+        (PARTITION BY pms.ProductKey ORDER BY pms.calendarMonth) AS PrevMonthSales,
+
+        -- Running Product Sales
+        SUM(pms.grossSales) OVER 
+        (PARTITION BY pms.ProductKey ORDER BY pms.calendarMonth) AS RunningProductSales
 
     FROM ProductMonthlySales AS pms
 ),
--- CTE 3 - ProductGrowth
-ProductGrowth AS (
+-- CTE 3 - ProductTrend
+ProductTrend AS (
     SELECT 
         pp.ProductKey,
         pp.calendarMonth,
@@ -55,20 +60,42 @@ ProductGrowth AS (
         pp.prevMonthSales,
 
         -- SalesDifference
-        NULLIF(pp.prevMonthSales 
-        -
-        pp.grossSales,pp.grossSales) AS salesDifference,
+        CASE
+            WHEN pp.prevMonthSales IS NULL OR pp.prevMonthSales = 0 THEN pp.grossSales
+            ELSE     
+            pp.grossSales
+            -
+            pp.prevMonthSales    
+            
+        END AS salesDifference,
 
         -- MoMgrowth%
         CASE
             WHEN pp.prevMonthSales IS NULL THEN 0
             ELSE 
-                (pp.prevMonthSales 
-                -
-                pp.grossSales)
+                (pp.grossSales - pp.prevMonthSales)
                 /
                 NULLIF(pp.prevMonthSales,0) 
                 * 100
-        END AS MOMGrowth
+        END AS MOMGrowth,
+
+        pp.runningProductSales
     FROM ProductPerformance AS pp
 )
+
+-- Fianl Select
+SELECT 
+        dp.ProductId,
+        dp.productName,
+        pt.calendarMonth,
+        pt.monthName,
+        pt.totalOrders,
+        ROUND(pt.AvgOrderValue,2) AS AvgOrderValue,
+        ROUND(pt.grossSales,2) AS grossSales,
+        ROUND(pt.prevMonthSales,2) AS prevMonthSales,
+        ROUND(pt.salesDifference,2) AS salesDifference,
+        ROUND(pt.MOMgrowth,2) AS MOMgrowth,
+        ROUND(pt.runningProductSales,2) AS RunningSales
+FROM ProductTrend AS pt
+INNER JOIN dimproduct AS dp
+    ON pt.productKey = dp.ProductKey;
