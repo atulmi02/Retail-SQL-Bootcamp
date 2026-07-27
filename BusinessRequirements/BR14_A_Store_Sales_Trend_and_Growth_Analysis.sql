@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-Business Requirement : BR #14 B - Store Performance & Operational Health
+Business Requirement : BR #14 A- Store Sales Trend & Growth Analysis
 Author               : Atul Kumar Keshari
 Database             : Retail_SQL_Bootcamp
 Description          : This report provides comprehensive analysis of Store Sales Trend & Growth Analysis by identifying  previous month sales, MOM Growth, Cumulative Sales.
@@ -94,54 +94,26 @@ StoreMonthlyTrend AS (
     FROM StorePerformance AS sp
 )
 
-/*
-=============== BR #14_B Starts Here =========
-*/
--- CTE 4 - StoreHealthSummary
--- StoreHealthSummary AS (
-    SELECT
-        smt.StoreKey,
-        /*
+-- FINAL SELECT
+SELECT 
+        ds.storeID,
+        ds.StoreName,
+        ds.city,
         smt.CalendarMonth,
         smt.MonthName,
+        
         smt.TotalOrders,
-        smt.AvgOrderValue,
-        smt.GrossSales,
-        smt.PrevMonthSales,
-        smt.SalesDiff,
-        smt.MoMGrowth,
-        smt.RunningSales,
-        smt.StoreRank,
-        */
-        -- Total Growth Months
-        SUM(
-            CASE 
-                WHEN smt.MoMGrowth > 0 Then 1
-                ELSE 0
-            END
-        ) AS TotalGrowthMonths,
+        ROUND(smt.AvgOrderValue,2) AS AvgOrderValue,
+        ROUND(smt.GrossSales,2) AS GrossSales,
+        ROUND(smt.PrevMonthSales,2) AS PrevMonthSales,
+        ROUND(smt.SalesDiff,2) AS SalesDiff,
+        ROUND(smt.MomGrowth,2) AS MoMGrowth,
+        ROUND(smt.RunningSales,2) AS RunningSales,
+        smt.StoreRank
 
-        -- Total Decline Months
-
-        SUM(
-            CASE 
-                WHEN smt.MoMGrowth < 0 Then 1
-                ELSE 0
-            END
-        ) AS TotalDeclineMonths,
-
-        -- Average MOM Growth
-        AVG(smt.MoMGrowth) AS AvgMoMGrowth,
-
-        -- Best Monthly Rank
-        MIN(smt.StoreRank) AS BestMonthRank,
-
-        -- Worst Monthly Rank
-        MAX(smt.StoreRank) AS WorstMonthRank,
-
-        -- Total Gross Sales
-        SUM(smt.GrossSales) AS StoreGrossSaLes
-    FROM StoreMonthlyTrend AS smt
-    GROUP BY smt.storeKey
-
+FROM StoreMonthlyTrend AS smt
+INNER JOIN dimstore AS ds
+    ON smt.storeKey = ds.storeKey
+WHERE smt.storeRank <=3 AND smt.calendarMonth = 3
+ORDER BY ds.StoreName,smt.CalendarMonth;
 

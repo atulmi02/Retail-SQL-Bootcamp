@@ -92,28 +92,17 @@ StoreMonthlyTrend AS (
         sp.storeRank
 
     FROM StorePerformance AS sp
-)
+),
 
 /*
 =============== BR #14_B Starts Here =========
 */
 -- CTE 4 - StoreHealthSummary
--- StoreHealthSummary AS (
+StoreHealthSummary AS (
     SELECT
         smt.StoreKey,
-        /*
-        smt.CalendarMonth,
-        smt.MonthName,
-        smt.TotalOrders,
-        smt.AvgOrderValue,
-        smt.GrossSales,
-        smt.PrevMonthSales,
-        smt.SalesDiff,
-        smt.MoMGrowth,
-        smt.RunningSales,
-        smt.StoreRank,
-        */
-        -- Total Growth Months
+        
+        -- Total Growth Months - Count months where sales increased compared to previous month
         SUM(
             CASE 
                 WHEN smt.MoMGrowth > 0 Then 1
@@ -121,8 +110,7 @@ StoreMonthlyTrend AS (
             END
         ) AS TotalGrowthMonths,
 
-        -- Total Decline Months
-
+        -- Total Decline Months - -- Count months where sales decreased compared to previous month
         SUM(
             CASE 
                 WHEN smt.MoMGrowth < 0 Then 1
@@ -140,8 +128,57 @@ StoreMonthlyTrend AS (
         MAX(smt.StoreRank) AS WorstMonthRank,
 
         -- Total Gross Sales
-        SUM(smt.GrossSales) AS StoreGrossSaLes
+        SUM(smt.GrossSales) AS TotalGrossSaLes
     FROM StoreMonthlyTrend AS smt
     GROUP BY smt.storeKey
+),
 
+-- CTE 5- StorePerformanceClassification
+StorePerformanceClassification AS (
+    SELECT 
+        shs.storeKey,
+        shs.TotalGrowthMonths,
+        shs.TotalDeclineMonths,
+        shs.AvgMoMGrowth,
+        shs.BestMonthRank,
+        shs.WorstMonthRank,
+        shs.TotalGrossSaLes,
+        CASE
+            WHEN shs.AvgMoMGrowth < -5 OR shs.TotalDeclineMonths > 6 
+                THEN 'Need Attention'
 
+            WHEN shs.TotalGrowthMonths >=8 AND shs.AvgMoMGrowth >0 
+                THEN 'Growing Store'
+
+            WHEN shs.TotalDeclineMonths >=8 AND shs.AvgMoMGrowth < 0 
+                THEN 'Declining Store'
+    
+            ELSE 'Stable'
+        END AS StoreStatus
+    FROM StoreHealthSummary AS shs
+)
+-- FINAL SELECT
+SELECT 
+    ds.StoreID,
+    ds.StoreName,
+    ds.City,
+    spc.TotalGrowthMonths,
+    spc.TotalDeclineMonths,
+    ROUND(spc.AvgMoMGrowth,2) AS AvgMoMGrowth,
+    spc.BestMonthRank,
+    spc.WorstMonthRank,
+    ROUND(spc.TotalGrossSaLes,2) AS TotalGrossSaLes,
+    spc.StoreStatus
+FROM StorePerformanceClassification AS spc
+INNER JOIN DimStore AS ds
+    ON spc.storeKey = ds.storeKey
+ORDER BY 
+    CASE spc.StoreStatus
+        WHEN 'Need Attention' THEN 1
+        WHEN 'Declining Store' THEN 2
+        WHEN 'Stable' THEN 3
+        WHEN 'Growing Store' THEN 4
+    END,
+spc.AvgMoMGrowth ASC,
+spc.TotalDeclineMonths DESC,
+spc.TotalGrossSaLes DESC;

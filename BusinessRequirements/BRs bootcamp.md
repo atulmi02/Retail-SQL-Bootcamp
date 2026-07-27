@@ -401,3 +401,61 @@ Retail_SQL_Bootcamp
 - Dashboard Dataset Design
 - Executive Reporting
 - Performance Optimization
+
+---
+## Advanced Concepts of Bootcamp
+
+Phase 2 – T-SQL Programming
+
+You'll learn:
+
+Variables
+IF...ELSE
+WHILE
+Temporary Tables
+Table Variables
+Stored Procedures
+User Defined Functions
+Views
+Transactions
+TRY...CATCH
+Dynamic SQL
+MERGE
+Cursors (when appropriate)
+Phase 3 – Performance Tuning
+Clustered vs Nonclustered Indexes
+Covering Indexes
+Execution Plans
+SARGable Queries
+Query Optimization
+Statistics
+Parameter Sniffing
+CTE vs Temp Tables
+APPLY Operator
+Advanced Window Function Performance
+Phase 4 – SSIS (ETL)
+
+Real ETL development:
+
+Import CSV/Excel files
+Lookup Transformation
+Derived Columns
+Conditional Split
+Slowly Changing Dimensions (SCD)
+Incremental Loading
+Error Handling
+Package Deployment
+SQL Server Agent Scheduling
+Phase 5 – SQL Developer Project
+
+You'll build a production-style project including:
+
+Star Schema
+Staging Layer
+ETL Procedures
+Incremental Loads
+Data Validation
+Logging & Error Handling
+SQL Server Views
+Stored Procedures
+Power BI Dashboard

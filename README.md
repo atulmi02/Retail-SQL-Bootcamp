@@ -44,21 +44,36 @@ The project focuses on solving practical analytics problems using professional S
 
 ## Business Requirements
 
-| BR   | Description                  | Status     |
-| ---- | ---------------------------- | ---------- |
-| BR01 | Sales Performance Analysis   | Completed  |
-| BR02 | Top Products by Net Sales    | Completed  |
-| BR03 | Customer Purchase Behaviour  | Completed  |
-| BR04 | Monthly Sales Trend Analysis | Completed  |
-| BR05 | Store Performance            | Completed  |
-| BR06 | Product Performance          | Completed  |
-| BR07 | Employee Performance         | Completed  |
-| BR00 | Promotion Effectiveness      | Completed  |
-| BR09 | Customer Lifetime Value      | Completed  |
-| BR10 | RFM Analysis                 | Completed  |
-| BR11 | Customer Retention & Repeat Purchase | Completed  |
-| BR12 | Month on Month Sales Growth Trend  | Completed  |
-| BR13 | Product Sales Month on Month Growth Trend | Completed  |
+| BR   | Description                               | Status    |
+| ---- | ----------------------------------------- | --------- |
+| BR01 | Sales Performance Analysis                | Completed |
+| BR02 | Top Products by Net Sales                 | Completed |
+| BR03 | Customer Purchase Behaviour               | Completed |
+| BR04 | Monthly Sales Trend Analysis              | Completed |
+| BR05 | Store Performance                         | Completed |
+| BR06 | Product Performance                       | Completed |
+| BR07 | Employee Performance                      | Completed |
+| BR00 | Promotion Effectiveness                   | Completed |
+| BR09 | Customer Lifetime Value                   | Completed |
+| BR10 | RFM Analysis                              | Completed |
+| BR11 | Customer Retention & Repeat Purchase      | Completed |
+| BR12 | Month on Month Sales Growth Trend         | Completed |
+| BR13 | Product Sales Month on Month Growth Trend | Completed |
+| BR14 | Store Sales Month on Month Growth Trend   | Pending   |
+| BR15 | Product Performance Ranking               | Pending   |
+| BR16 | Customer Cohort Analysis                  | Pending   |
+
+---
+## Concepts to Implement
+| BR   | Business Topic              | New SQL Concepts                                   |
+| ---- | --------------------------- | -------------------------------------------------- |
+| BR14 | Store Sales Trend           | `LEAD()`, store trends                             |
+| BR15 | Product Performance Ranking | Multiple `RANK()`, Top/Bottom N                    |
+| BR16 | Customer Cohort Analysis    | First purchase cohort, retention                   |
+| BR17 | Pareto Analysis (80/20)     | Running %, cumulative contribution                 |
+| BR18 | Complete Time Series        | Calendar scaffold, `CROSS JOIN`, zero-sales months |
+| BR19 | Inventory Movement          | `LEAD()`, inventory gaps                           |
+| BR20 | Executive KPI Dashboard     | Combined KPIs, advanced window functions           |
 
 
 ## Skills Demonstrated

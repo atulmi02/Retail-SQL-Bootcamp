@@ -8,7 +8,7 @@ The report should compare monthly sales of every product and identify products w
 
 --- 
 
-## Business Requirement
+## Business Objective
 
 - Which products generated the highest monthly sales?
 - How did each product perform compared to previous month?
@@ -79,7 +79,7 @@ Calculate:
 
 - Order By ProductName,Month 
 
-ProductId | PrductName | MonthName | TotalOrders | AOV | GrossSales | PrevMonthSales | SalesDifference | MOMGrowth | RunningSales 
+ProductId | ProductName | MonthName | TotalOrders | AOV | GrossSales | PrevMonthSales | SalesDifference | MOMGrowth | RunningSales 
 
 ## Production Consideration
 
