@@ -82,7 +82,7 @@ CustomerSegment AS (
 
             WHEN (
                 rs.RScore <= 2 AND 
-                FScore >= 3
+                rs.FScore >= 3
             ) THEN 'At Risk'
 
             ELSE 'Lost Customers'

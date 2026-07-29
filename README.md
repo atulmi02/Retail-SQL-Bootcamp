@@ -59,21 +59,19 @@ The project focuses on solving practical analytics problems using professional S
 | BR11 | Customer Retention & Repeat Purchase      | Completed |
 | BR12 | Month on Month Sales Growth Trend         | Completed |
 | BR13 | Product Sales Month on Month Growth Trend | Completed |
-| BR14 | Store Sales Month on Month Growth Trend   | Pending   |
-| BR15 | Product Performance Ranking               | Pending   |
-| BR16 | Customer Cohort Analysis                  | Pending   |
+| BR14 | Store Sales Month on Month Growth Trend   | Completed |
+| BR15 | Customer Cohort Analysis                  | Pending   |
+| BR16 | Pareto Analysis (80/20)                   | Pending   |
 
 ---
 ## Concepts to Implement
 | BR   | Business Topic              | New SQL Concepts                                   |
 | ---- | --------------------------- | -------------------------------------------------- |
-| BR14 | Store Sales Trend           | `LEAD()`, store trends                             |
-| BR15 | Product Performance Ranking | Multiple `RANK()`, Top/Bottom N                    |
-| BR16 | Customer Cohort Analysis    | First purchase cohort, retention                   |
-| BR17 | Pareto Analysis (80/20)     | Running %, cumulative contribution                 |
-| BR18 | Complete Time Series        | Calendar scaffold, `CROSS JOIN`, zero-sales months |
-| BR19 | Inventory Movement          | `LEAD()`, inventory gaps                           |
-| BR20 | Executive KPI Dashboard     | Combined KPIs, advanced window functions           |
+| BR15 | Customer Cohort Analysis    | First purchase cohort, retention                   |
+| BR16 | Pareto Analysis (80/20)     | Running %, cumulative contribution                 |
+| BR17 | Complete Time Series        | Calendar scaffold, `CROSS JOIN`, zero-sales months |
+| BR18 | Inventory Movement          | `LEAD()`, inventory gaps                           |
+| BR19 | Executive KPI Dashboard     | Combined KPIs, advanced window functions           |
 
 
 ## Skills Demonstrated

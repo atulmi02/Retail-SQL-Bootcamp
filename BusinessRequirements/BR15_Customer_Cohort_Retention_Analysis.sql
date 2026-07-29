@@ -24,7 +24,6 @@ WITH CustomerFirstPurchase AS (
 CustomerActivity AS (
     SELECT 
         fs.customerKey,
-        dd.fulldate,
         dd.calendarMonth,
         dd.monthName
     FROM factsales as fs
@@ -32,6 +31,9 @@ CustomerActivity AS (
         ON fs.DateKey = dd.DateKey
     WHERE dd.CalendarYear = 2025
         AND fs.SalesStatus = 'completed'
+    GROUP BY fs.customerKey,
+            dd.calendarMonth,
+            dd.monthName
 ),
 -- CustomerCohort
 CustomerCohort AS (
@@ -46,6 +48,7 @@ CustomerCohort AS (
         ON cfp.firstPurchase = dd.fulldate
     INNER JOIN CustomerActivity AS ca
         ON cfp.customerKey = ca.customerKey
+    WHERE ca.calendarMonth >= dd.calendarMonth
 ),
 -- CTE 4 -CohortSummary
 CohortSummary AS (
@@ -61,12 +64,16 @@ CohortSummary AS (
         cc.CohortMonth,
         cc.ActivityCalendarMonth,
         cc.ActivityMonth
-)
+),
 
--- CTE 5- RetentionAnalysis
--- RetentionAnalysis AS (
+-- CTE 5- CohortSize
+CohortMetrics AS (
     SELECT 
-        cs.*,
+        cs.ActiveCustomers,
+        cs.CohortCalendarMonth,
+        cs.CohortMonth,
+        cs.ActivityCalendarMonth,
+        cs.ActivityMonth,
         MAX(
             CASE 
                 WHEN cs.CohortCalendarMonth = cs.ActivityCalendarMonth THEN cs.ActiveCustomers
@@ -74,3 +81,40 @@ CohortSummary AS (
         OVER (PARTITION BY cs.CohortCalendarMonth)
         AS CohortSize
     FROM CohortSummary AS cs
+),
+-- CTE 6- RetentionAnalysis
+RetentionAnalysis AS (
+    SELECT
+        csc.ActiveCustomers,
+        csc.CohortCalendarMonth,
+        csc.CohortMonth,
+        csc.ActivityCalendarMonth,
+        csc.ActivityMonth,
+        csc.cohortSize,
+        -- RetentionPct
+        CAST(csc.ActiveCustomers AS DECIMAL(18,2))
+        /
+        NULLIF(csc.CohortSize,0)
+        * 100 AS RetentionPct,
+        -- Months Since Acquisition
+        csc.ActivityCalendarMonth - csc.CohortCalendarMonth AS MonthsSinceAcquisition
+    FROM CohortMetrics AS csc
+)
+-- Final Select
+SELECT 
+    -- ra.CohortCalendarMonth,
+    ra.CohortMonth,
+    -- ra.ActivityCalendarMonth,
+
+    ra.ActivityMonth, 
+    ra.MonthsSinceAcquisition,
+
+    ra.cohortSize,
+    ra.ActiveCustomers,
+
+    ROUND(ra.RetentionPct,2) AS retentionPct  
+
+FROM RetentionAnalysis AS ra
+ORDER BY   
+        ra.CohortCalendarMonth,
+        ra.ActivityCalendarMonth;
