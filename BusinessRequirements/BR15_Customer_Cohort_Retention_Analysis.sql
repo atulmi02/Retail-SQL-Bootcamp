@@ -35,7 +35,7 @@ CustomerActivity AS (
             dd.calendarMonth,
             dd.monthName
 ),
--- CustomerCohort
+-- CTE 3- CustomerCohort - Assign cohort to each purchase
 CustomerCohort AS (
     SELECT 
         cfp.customerKey,
@@ -50,7 +50,7 @@ CustomerCohort AS (
         ON cfp.customerKey = ca.customerKey
     WHERE ca.calendarMonth >= dd.calendarMonth
 ),
--- CTE 4 -CohortSummary
+-- CTE 4 -CohortSummary - get active customers
 CohortSummary AS (
     SELECT 
         COUNT(DISTINCT(cc.customerKey)) AS ActiveCustomers,

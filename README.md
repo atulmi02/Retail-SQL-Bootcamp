@@ -60,8 +60,10 @@ The project focuses on solving practical analytics problems using professional S
 | BR12 | Month on Month Sales Growth Trend         | Completed |
 | BR13 | Product Sales Month on Month Growth Trend | Completed |
 | BR14 | Store Sales Month on Month Growth Trend   | Completed |
-| BR15 | Customer Cohort Analysis                  | Pending   |
-| BR16 | Pareto Analysis (80/20)                   | Pending   |
+| BR15 | Customer Cohort Analysis                  | Completed |
+| BR16 | Customer LifetimeValue Pareto Analysis (80/20)  | Completed |
+| BR17 | Complete Time Series                       | Completed |
+| BR17 | Inventory Movement                         | Pending |
 
 ---
 ## Concepts to Implement
