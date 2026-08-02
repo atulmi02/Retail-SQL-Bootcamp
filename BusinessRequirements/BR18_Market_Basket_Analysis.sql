@@ -51,7 +51,6 @@ ProductPairMetrics AS (
                     pf.OrderedTogether DESC, 
                     pf.ProductKey1, 
                     pf.ProductKey2 
-                    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
             ) AS ProductPairRank,
 
         -- Total Pair Orders
@@ -74,7 +73,12 @@ PairContribution AS (
         * 100 AS PairContributionPercentage,
 
         -- TOP N Pairs
-        NTILE(5) OVER (ORDER BY ppm.OrderedTogether DESC) AS TopNPairs,
+        NTILE(5) OVER 
+            (ORDER BY 
+                ppm.OrderedTogether DESC,
+                ppm.ProductKey1,
+                ppm.ProductKey2
+            )AS TopNPairs,
 
          -- Cumulative %
         SUM(
@@ -87,16 +91,7 @@ PairContribution AS (
                 ppm.OrderedTogether DESC, 
                 ppm.ProductKey1, 
                 ppm.ProductKey2 
-                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS CumulativePairPct,
-
-        -- TOP N Pairs
-        CASE 
-            WHEN NTILE(5) OVER (ORDER BY ppm.OrderedTogether DESC) = 1 THEN 'Top 20%' 
-            WHEN NTILE(5) OVER (ORDER BY ppm.OrderedTogether DESC) = 2 THEN '20% - 40%' 
-            WHEN NTILE(5) OVER (ORDER BY ppm.OrderedTogether DESC) = 3 THEN '40% - 60%' 
-            WHEN NTILE(5) OVER (ORDER BY ppm.OrderedTogether DESC) = 4 THEN '60% - 80%' 
-            ELSE 'Bottom 20%'
-        END AS TopPairs
+                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS CumulativePairPct
 
     FROM ProductPairMetrics AS ppm
 )
@@ -109,9 +104,18 @@ SELECT
         abc.OrderedTogether,
         abc.ProductPairRank,
         abc.TotalPairOrders,
-        abc.PairContributionPercentage,
-        abc.CumulativePairPct,
-        abc.TopPairs,
+        ROUND(abc.PairContributionPercentage,2) AS PairContributionPercentage,
+        ROUND(abc.CumulativePairPct,2) AS CumulativePairPct,
+        abc.TopNPairs,
+
+        -- TOP N Pairs
+        CASE 
+            WHEN abc.TopNPairs = 1 THEN 'Top 20%' 
+            WHEN abc.TopNPairs = 2 THEN '20% - 40%' 
+            WHEN abc.TopNPairs = 3 THEN '40% - 60%' 
+            WHEN abc.TopNPairs = 4 THEN '60% - 80%' 
+            ELSE 'Bottom 20%'
+        END AS TopPairs,
 
         -- ABC Classification based on Cumulative Orders
         CASE 
@@ -120,7 +124,6 @@ SELECT
             ELSE 'C'
         END AS ABCClassification
         
-
 FROM PairContribution AS abc
 INNER JOIN DimProduct AS dp1
     ON abc.ProductKey1 = dp1.ProductKey
