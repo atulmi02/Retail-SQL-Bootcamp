@@ -17,5 +17,8 @@ Thumbs.db
 .DS_Store
 
 # Ignore business requirements files
-BusinessRequirements/BRs bootcamp.md
-BusinessRequirements/trial.sql
+BusinessRequirements/FutureIdeas/BRs_bootcamp.md
+BusinessRequirements/FutureIdeas/trial.sql
+
+# Ignore Uncompleted files or Folders
+BusinessRequirements/FutureIdeas
