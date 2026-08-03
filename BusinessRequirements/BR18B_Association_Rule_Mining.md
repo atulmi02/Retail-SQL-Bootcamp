@@ -25,10 +25,11 @@ The report should measure the strength of relationships between products using S
 - Orders containing Product A
 - Orders containing Product B
 - Orders containing both
-- Support
-- Confidence
+- Total Completed Orders
+- Support %
+- Confidence %
 - Lift
-- Product Rank
+- Product Association Rank
 
 ## Tables Required
 
@@ -68,12 +69,14 @@ Product A | Product B | Orders(A) | Orders(B) | Orders(A&B) | Support % | Confid
     - Product B
     - OrderTogether
 
-### CTE 4 - ProductFrequency
+### CTE 4 - IndividualProductFrequency
 Count how many orders each individual product appears in
     - ProductKey
     - OrdersContainingProduct
 
-### CTE 5 - AssociationMetrics
+### CTE 5 - TotalOrders
+
+### CTE 6 - AssociationMetrics
     - Orders A
     - Orders B
     - Orders A&B
@@ -88,4 +91,23 @@ Count how many orders each individual product appears in
 3. Lift = ​Confidence A -> B / Support (B)
    OR
    Lift = Orders(A∩B) * Total Orders / Orders A * Orders B
-   
+
+## Query Design
+
+OrderProducts
+        │
+        ▼
+ProductPairs
+        │
+        ▼
+ProductPairFrequency
+        │
+        ├──────────────┐
+        ▼              ▼
+Association      IndividualProductFrequency
+        │              │
+        └──────┬───────┘
+               ▼
+        AssociationMetrics
+               ▼
+          FinalMetrics
