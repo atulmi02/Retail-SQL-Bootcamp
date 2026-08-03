@@ -1,4 +1,4 @@
-# BR#14B - Store Performance & Operational Health
+# BR #14B - Store Performance & Operational Health
 
 ## Dependency
 

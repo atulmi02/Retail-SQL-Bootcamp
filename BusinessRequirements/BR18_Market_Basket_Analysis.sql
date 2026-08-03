@@ -16,7 +16,7 @@ WITH OrderProducts AS (
         ON fs.DateKey = dd.DateKey
     WHERE dd.CalendarYear = 2025 AND fs.salesStatus = 'completed'
 ),
--- CTE 2 - ProductPairs
+-- CTE 2 - ProductPairs - Using Self Join
 ProductPairs AS (
     SELECT 
         op1.orderNumber,
