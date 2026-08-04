@@ -47,6 +47,30 @@
 - And push:
   - git push
 
+---
+
+main
+  │
+  │
+  ├───────────────
+                  |
+            Retail_Sql_Working
+                   │
+            BR19 Completed
+                   │
+      git fetch origin
+                   │
+      git pull origin main
+                   │
+      git merge main
+                   │
+     (resolve conflicts if any)
+                   │
+      git switch main
+                   │
+ git merge Retail_Sql_Working
+                   │
+      git push origin main
 
 ---
 
