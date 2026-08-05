@@ -6,10 +6,30 @@ Database             : Retail_SQL_Bootcamp
 Description          : Description :
 This report provides an executive summary of yearly business performance by consolidating Sales, Customer, Promotion, Return, Product, Region, and Trend KPIs into a single reporting dataset.
 */
+
+-- BaseTable - FactSales
+WITH BaseSales AS (
+    SELECT 
+        dd.CalendarYear,
+        dd.CalendarMonth,
+        
+        fss.CustomerKey,
+        fss.ProductKey,
+        fss.StoreKey,
+        fss.PromotionKey,
+        fss.salesAmount,
+        fss.OrderNumber,
+        fss.SalesQuantity
+    FROM FactSales AS fss
+    INNER JOIN DimDate AS dd
+        ON fss.dateKey = dd.dateKey
+    WHERE fss.salesStatus = 'completed'
+    
+),
 -- CTE 1 - SalesSummary
-WITH SalesSummary AS (
+SalesSummary AS (
     SELECT
-        dd.calendarYear,
+        fs.calendarYear,
 
         -- GrossSales
         SUM(fs.salesAmount) AS GrossSales,
@@ -28,17 +48,14 @@ WITH SalesSummary AS (
         AS DECIMAL(18,2))
         AS AverageOrderValue
         
-    FROM factSales AS fs
-    INNER JOIN DimDate AS dd
-        ON fs.dateKey = dd.dateKey
-    WHERE fs.salesStatus = 'completed'
-    GROUP BY dd.CalendarYear
+    FROM BaseSales AS fs
+    GROUP BY fs.CalendarYear
 ),
 
 -- CTE 2 - CustomerSummary
 CustomerSummary AS (
     SELECT
-        dd.calendarYear,
+        fs.calendarYear,
         -- ActiveCustomer
         COUNT(DISTINCT fs.customerKey) AS ActiveCustomer,
 
@@ -50,17 +67,14 @@ CustomerSummary AS (
         AS DECIMAL(18,2)) 
         AS RevenuePerCustomer
 
-    FROM factSales AS fs
-    INNER JOIN dimDate AS dd
-        ON fs.dateKey = dd.dateKey
-    WHERE fs.salesStatus = 'completed'
-    GROUP BY dd.calendarYear
+    FROM BaseSales AS fs
+    GROUP BY fs.calendarYear
 ),
 
 -- CTE 3 - PromotionSummary
 PromotionSummary AS (
     SELECT
-        dd.calendarYear,
+        fs.calendarYear,
         -- GrossSales
         SUM(
             CASE 
@@ -69,27 +83,21 @@ PromotionSummary AS (
             END 
         ) AS PromotionSales
 
-    FROM factSales AS fs
-    INNER JOIN dimDate AS dd
-        ON fs.dateKey = dd.dateKey
-    WHERE fs.salesStatus = 'completed'
-    GROUP BY dd.calendarYear
+    FROM BaseSales AS fs
+    GROUP BY fs.calendarYear
 ),
 
 -- CTE 4 - ProductSummary 
 ProductSummary AS (
     SELECT
-        dd.CalendarYear,
+        fs.calendarYear,
         dp.productKey,
         dp.productName,
         SUM(fs.salesAmount) AS GrossSales          
-    FROM factSales AS fs
+    FROM BaseSales AS fs
     INNER JOIN dimproduct AS dp
         ON fs.ProductKey = dp.ProductKey
-    INNER JOIN dimdate AS dd
-        ON fs.DateKey = dd.DateKey
-    WHERE fs.SalesStatus = 'completed'
-    GROUP BY dd.CalendarYear,
+    GROUP BY fs.calendarYear,
             dp.productKey,
             dp.productName
 ),
@@ -110,18 +118,16 @@ ProductRank AS (
 -- CTE 5 - Category Summary
 CategorySummary AS (
     SELECT
-        dd.CalendarYear,
+        fs.calendarYear,
         dp.category,
 
         SUM(fs.salesAmount) AS GrossSales          
     
-    FROM factSales AS fs
+    FROM BaseSales AS fs
     INNER JOIN dimproduct AS dp
         ON fs.ProductKey = dp.ProductKey
-    INNER JOIN dimdate AS dd
-        ON fs.DateKey = dd.DateKey
-    WHERE fs.SalesStatus = 'completed'
-    GROUP BY dd.CalendarYear,
+    
+    GROUP BY fs.calendarYear,
             dp.category
 ),
 CategoryRank AS (
@@ -140,18 +146,16 @@ CategoryRank AS (
 -- CTE 6.1 - RegionSummary
 RegionSummary AS (
     SELECT
-        dd.CalendarYear,
+        fs.calendarYear,
         ds.region,
 
         SUM(fs.salesAmount) AS GrossSales          
     
-    FROM factSales AS fs
+    FROM BaseSales AS fs 
     INNER JOIN dimstore AS ds
         ON fs.StoreKey = ds.StoreKey
-    INNER JOIN dimdate AS dd
-        ON fs.DateKey = dd.DateKey
-    WHERE fs.SalesStatus = 'completed'
-    GROUP BY dd.CalendarYear,
+    
+    GROUP BY fs.calendarYear,
             ds.Region
 ),
 -- CTE 6.2 - RegionRank
@@ -171,9 +175,9 @@ RegionRank AS (
 -- CTE 7.1 - MonthlySales: Calculate monthly sales
 MonthlySales AS (
     SELECT
-        dd.CalendarYear,
-        dd.CalendarMonth,
-        dd.monthName,
+        fs.calendarYear,
+        fs.CalendarMonth,
+        
         
         CAST(SUM(fs.salesAmount) AS DECIMAL(18,4)) AS GrossSales,
         
@@ -181,15 +185,11 @@ MonthlySales AS (
         
         COUNT(DISTINCT fs.OrderNumber) AS TotalOrders
     
-    FROM FactSales AS fs
-    INNER JOIN DimDate AS dd
-        ON fs.DateKey = dd.DateKey
-    
-    WHERE fs.SalesStatus = 'Completed'
+    FROM BaseSales AS fs
     GROUP BY 
-             dd.CalendarYear, 
-             dd.CalendarMonth,
-             dd.monthName
+             fs.calendarYear, 
+             fs.CalendarMonth
+            
 ),
 
 -- CTE 7.2 - SalesTrend : Calculate 3 Month Moving Average, Running Total, Previous Month Sales, and Previous Year Sales.
@@ -197,7 +197,7 @@ SalesTrend AS (
     SELECT 
         ms.CalendarYear,
         ms.CalendarMonth,
-        ms.monthName,
+        
         ms.GrossSales,
         ms.QuantitySold,
         ms.TotalOrders,
@@ -220,7 +220,7 @@ GrowthMetrics AS (
     SELECT
         st.CalendarYear,
         st.CalendarMonth,
-        st.monthName,
+        
        
         st.PreviousMonthSales,
         st.PreviousYearSales,
@@ -247,7 +247,6 @@ LatestTrend AS (
     SELECT 
         gm.CalendarYear,
         gm.CalendarMonth,
-        gm.monthName,
       
         ROUND(gm.PreviousMonthSales,2) AS PreviousMonthSales,
         ROUND(gm.PreviousYearSales,2) AS PreviousYearSales,
@@ -261,6 +260,7 @@ LatestTrend AS (
 )
 
 -- FINAL DASHBOARD
+
 SELECT
     -- SalesSummary output
     ss.calendarYear,
