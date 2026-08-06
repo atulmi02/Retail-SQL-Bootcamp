@@ -326,6 +326,8 @@ Retail_SQL_Bootcamp
 | BR18 | Market Basket Analysis | Self JOIN, Pair Analysis | Basket Analysis |
 | BR19 | Executive Dashboard Dataset | Complex CTEs, Dashboard KPIs | Dashboard Dataset Design |
 | BR20 | Executive Summary Report | Combined KPIs, Multi-Source Reporting | Executive Reporting |
+BR21	Executive Dashboard Dataset	Dashboard-ready fact dataset Primary Power BI model
+BR22	Executive Dashboard Optimization	Performance tuning	Production readiness
 
 ---
 
