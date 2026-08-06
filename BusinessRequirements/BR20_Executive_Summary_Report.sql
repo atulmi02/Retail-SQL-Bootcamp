@@ -78,7 +78,7 @@ PromotionSummary AS (
         -- GrossSales
         SUM(
             CASE 
-                WHEN fs.PromotionKey IS NOT NULL AND fs.PromotionKey <> 0 THEN fs.SalesAmount
+                WHEN fs.PromotionKey IS NOT NULL AND fs.PromotionKey > 0 THEN fs.SalesAmount
                 ELSE 0
             END 
         ) AS PromotionSales

@@ -24,7 +24,7 @@
 8. Merge into main (when the feature is complete)
   - git switch main
   - git pull origin main
-  - git merge newBranchName
+  - git merge "BranchName"
   - git push origin main
 9. Delete the branch (optional, after merging)
   - Delete the local branch:
